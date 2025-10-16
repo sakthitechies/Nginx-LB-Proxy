@@ -1,0 +1,30 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy app to EC2
+        run: |
+          for host in $(echo "${{ secrets.EC2_HOSTS }}" | tr ',' '\n'); do
+            echo "Deploying to $host"
+            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@$host "sudo rm -rf /var/www/html/*"
+            scp -o StrictHostKeyChecking=no -r ./app/* ${{ secrets.EC2_USER }}@$host:/var/www/html/
+            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@$host "sudo systemctl restart nginx"
+          done
+
