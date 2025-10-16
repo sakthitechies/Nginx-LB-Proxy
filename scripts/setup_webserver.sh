@@ -6,7 +6,7 @@ sudo systemctl enable nginx
 sudo systemctl start nginx
 
 # Copy website files (assuming repo cloned in /home/ubuntu)
-sudo cp -r ~/nginx-proxy-lb-demo/app/* /var/www/html/
+sudo cp -r ~/Nginx-LB-Proxy/app/* /var/www/html/
 
 echo "✅ Web server setup complete on $(hostname)"
 
